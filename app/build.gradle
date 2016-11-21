@@ -1,0 +1,77 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.3"
+    defaultConfig {
+        applicationId "com.go.cqh.goodprojects"
+        minSdkVersion 16
+        targetSdkVersion 24
+        versionCode 3
+        versionName "1.2"
+        ndk {
+            //设置支持的SO库架构
+            abiFilters 'armeabi' , 'x86'//, 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    /*指定不同渠道号生成的apk的名字*/
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                File outputDirectory = new File(outputFile.parent);
+                def fileName
+                if (variant.buildType.name == "release") {
+//                    fileName =_${variant.productFlavors[0].name}_v${defaultConfig.versionName}_${new Date().format("MMdd")}_release.apk"
+                    fileName = "kandiam_v${defaultConfig.versionName}_release.apk"
+                }else if (variant.buildType.name == "playstore"){
+//                    fileName = "app_${variant.productFlavors[0].name}_v${defaultConfig.versionName}_${new Date().format("MMdd")}_playstore.apk"
+                    fileName = "kandiam_v${defaultConfig.versionName}_appstore.apk"
+                } else {
+//                    fileName = "app_${variant.productFlavors[0].name}_v${defaultConfig.versionName}_${new Date().format("MMdd")}_bata.apk"
+                    fileName = "kandiam_v${defaultConfig.versionName}_bata.apk"
+                }
+                output.outputFile = new File(outputDirectory, fileName)
+            }
+        }
+    }
+}
+
+apply plugin: 'android-apt'
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'com.zhy:autolayout:1.4.3'
+    compile 'com.github.hackware1993:MagicIndicator:1.4.0'
+    compile 'com.yolanda.nohttp:nohttp:1.0.4'
+    compile 'com.android.support:support-v4:24.2.1'
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.alibaba:fastjson:1.2.21'
+    compile 'com.zhy:base-rvadapter:3.0.3'
+    compile 'com.tencent.bugly:crashreport_upgrade:latest.release'
+    //其中latest.release指代最新版本号，也可以指定明确的版本号，例如1.0.0
+    compile 'com.tencent.bugly:nativecrashreport:latest.release'
+    //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.2.0
+}
+repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    maven {
+        url "https://jitpack.io"
+    }
+}
